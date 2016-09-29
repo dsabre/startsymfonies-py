@@ -36,8 +36,8 @@ localIp = "127.0.0."
 finalLocalIp = 1
 publicPort = 8000
 symfonies = []
-htmlFilename = Config.get('config', 'htmlFilename')
-htmlTitle = Config.get('config', 'htmlTitle')
+htmlFilename = Config.get('config', 'htmlfilename')
+htmlTitle = Config.get('config', 'htmltitle')
 
 # cycle over directory for find all symfonies
 for dirname, dirnames, filenames in os.walk(dir):
