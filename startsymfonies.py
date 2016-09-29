@@ -1,40 +1,63 @@
-import os, datetime, sys, socket
+import os, sys, socket, pprint
 from subprocess import call
 
-year = str(datetime.datetime.now().year)
-workDir = '/home/dsabre/Lavoro'
-dir = workDir + '/git/' + year
-publicIp = socket.gethostbyname(socket.gethostname())
-ip = "127.0.0."
-finalIp = 1
-publicPort = 8000
-symfonies = []
-htmlFilename = '/tmp/symfonies.html'
-htmlTitle = 'Active Symfonies'
+try:
+    from configparser import ConfigParser
+except ImportError:
+    from ConfigParser import ConfigParser  # ver. < 3.0
+
+# check if config.ini exists
+configFile = os.path.dirname(os.path.abspath(__file__)) + '/config.ini'
+Config = ConfigParser()
+if not os.path.isfile(configFile):
+	config = open(configFile, 'w')
+	Config.add_section('config')
+	Config.set('config', 'dir', 'INSER_HERE_YOUR_PATH')
+	Config.set('config', 'htmlFilename', '/tmp/symfonies.html')
+	Config.set('config', 'htmlTitle', 'Active Symfonies')
+	Config.write(config)
+	config.close()
+	print 'Config file not found, no problem, we have now created that for you! ;)\nOpen ' + configFile + ' and set your directory to scan.'
+	sys.exit()
+
+# read configuration
+Config.read(configFile)
+
+# get directory to scan
+dir = Config.get('config', 'dir')
 
 # check for valid directory
 if not os.path.isdir(dir):
 	print 'Invalid directory ' + dir
 	sys.exit()
 
+publicIp = socket.gethostbyname(socket.gethostname())
+localIp = "127.0.0."
+finalLocalIp = 1
+publicPort = 8000
+symfonies = []
+htmlFilename = Config.get('config', 'htmlFilename')
+htmlTitle = Config.get('config', 'htmlTitle')
+
 # cycle over directory for find all symfonies
 for dirname, dirnames, filenames in os.walk(dir):
 	fname = dirname + '/app/console'
 	if os.path.isfile(fname):
-		# start symfony
-		address = ip + str(finalIp)
-		
+		# start symfony in private address
+		address = localIp + str(finalLocalIp)
 		call(["php", fname, "server:start", address])
-		call(["php", fname, "server:start", publicIp, "-p", str(publicPort)])
 		
-		finalIp += 1
-		publicPort += 1
+		# start symfony in public path
+		call(["php", fname, "server:start", publicIp, "-p", str(publicPort)])
 		
 		symfonies.append({
 			'dirname': dirname,
 			'address': address,
 			'publicPort': publicPort
 		})
+		
+		finalLocalIp += 1
+		publicPort += 1
 
 # creation of menu html file
 if symfonies:
