@@ -76,26 +76,28 @@ if symfonies:
 		'<body>\n',
 		'\t<div class="container-fluid">\n',
 		'\t<h1>' + htmlTitle + '</h1>\n',
-		'\t<table class="table table-bordered table-hover">\n',
-		'\t\t<tr>\n',
-		'\t\t\t<th>Path</th>\n',
-		'\t\t\t<th>Private link</th>\n',
-		'\t\t\t<th>Public link</th>\n',
-		'\t\t</tr>\n'
+		'\t<div class="table-responsive">\n',
+		'\t\t<table class="table table-bordered table-hover">\n',
+		'\t\t\t<tr>\n',
+		'\t\t\t\t<th>Path</th>\n',
+		'\t\t\t\t<th>Private link</th>\n',
+		'\t\t\t\t<th>Public link</th>\n',
+		'\t\t\t</tr>\n'
 	]);
 	
 	for symfony in symfonies:
 		privateAddress = 'http://' + symfony['address'] + ':8000'
 		publicAddress = 'http://' + publicIp + ':' + str(symfony['publicPort'])
 		
-		target.write('\t\t<tr>\n')
-		target.write('\t\t\t<td>' + symfony['dirname'] + '</td>\n')
-		target.write('\t\t\t<td><a href="' + privateAddress + '">' + privateAddress + '</a></td>\n')
-		target.write('\t\t\t<td><a href="' + publicAddress + '">' + publicAddress + '</a></td>\n')
-		target.write('\t\t</tr>\n')
+		target.write('\t\t\t<tr>\n')
+		target.write('\t\t\t\t<td>' + symfony['dirname'] + '</td>\n')
+		target.write('\t\t\t\t<td><a href="' + privateAddress + '">' + privateAddress + '</a></td>\n')
+		target.write('\t\t\t\t<td><a href="' + publicAddress + '">' + publicAddress + '</a></td>\n')
+		target.write('\t\t\t</tr>\n')
 	
 	target.writelines([
-		'\t</table>\n',
+		'\t\t</table>\n',
+		'\t\t</div>\n',
 		'\t</div>\n',
 		'\t<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>\n',
 		'\t<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>\n',
