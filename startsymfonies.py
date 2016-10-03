@@ -1,5 +1,6 @@
-import os, sys, socket, pprint
+import os, sys, socket
 from subprocess import call
+from time import sleep
 
 try:
     from configparser import ConfigParser
@@ -43,12 +44,33 @@ htmlTitle = Config.get('config', 'htmltitle')
 for dirname, dirnames, filenames in os.walk(dir):
     fname = dirname + '/app/console'
     if os.path.isfile(fname):
-        # start symfony in private address
+        # define local address
         address = localIp + str(finalLocalIp)
-        call(["php", fname, "server:start", address])
 
-        # start symfony in public path
-        call(["php", fname, "server:start", publicIp, "-p", str(publicPort)])
+        print dirname
+        sys.stdout.write('STOP: ')
+
+        # try to stop private and public symfony
+        s1 = call(["php", fname, "-q", "server:stop", address])
+        s2 = call(["php", fname, "-q", "server:stop", publicIp, "-p", str(publicPort)])
+
+        if s1 == 0 and s2 == 0:
+            print 'OK'
+        else:
+            print 'KO'
+
+        sys.stdout.write('START: ')
+
+        sleep(1)
+
+        # try to start private and public symfony
+        s1 = call(["php", fname, "-q", "server:start", address])
+        s2 = call(["php", fname, "-q", "server:start", publicIp, "-p", str(publicPort)])
+
+        if s1 == 0 and s2 == 0:
+            print 'OK'
+        else:
+            print 'KO'
 
         symfonies.append({
             'dirname': dirname,
