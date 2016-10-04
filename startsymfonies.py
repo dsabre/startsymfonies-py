@@ -1,4 +1,4 @@
-import os, sys, socket, pprint
+import os, sys, socket, getopt, pprint
 from subprocess import call
 from time import sleep
 
@@ -19,7 +19,17 @@ if not os.path.isfile(configFile):
     Config.write(config)
     config.close()
     print 'Config file not found, no problem, we have now created that for you! ;)\nOpen ' + configFile + ' and set your directory to scan.'
-    sys.exit()
+    sys.exit(1)
+
+# permit opt --start-only to perform only the start of the symfonies
+try:
+    opts, args = getopt.getopt(sys.argv[1:], '', ['start-only'])
+    startOnly = '--start-only' in opts[0]
+except getopt.GetoptError:
+    print 'Invalid argument'
+    sys.exit(2)
+except IndexError:
+    startOnly = False
 
 # read configuration
 Config.read(configFile)
@@ -30,7 +40,7 @@ dir = Config.get('config', 'dir')
 # check for valid directory
 if not os.path.isdir(dir):
     print 'Invalid directory ' + dir
-    sys.exit()
+    sys.exit(3)
 
 publicIp = socket.gethostbyname(socket.gethostname())
 localIp = "127.0.0."
@@ -91,20 +101,23 @@ if symfonies:
         print str(i) + '/' + count + ' ::: ' + symfony['dirname']
         i += 1
 
-        sys.stdout.write('STOP : ')
+        if not startOnly:
+            sys.stdout.write('STOP : ')
 
-        # try to stop private and public symfony
-        s1 = call(["php", fname, "-q", "server:stop", symfony['address']])
-        s2 = call(["php", fname, "-q", "server:stop", publicIp, "-p", str(symfony['publicPort'])])
+            # try to stop private and public symfony
+            s1 = call(["php", fname, "-q", "server:stop", symfony['address']])
+            s2 = call(["php", fname, "-q", "server:stop", publicIp, "-p", str(symfony['publicPort'])])
 
-        if s1 == 0 and s2 == 0:
-            print 'OK'
+            if s1 == 0 and s2 == 0:
+                print 'OK'
+            else:
+                print 'KO'
+
+            sys.stdout.write('START: ')
+
+            sleep(1)
         else:
-            print 'KO'
-
-        sys.stdout.write('START: ')
-
-        sleep(1)
+            sys.stdout.write('START: ')
 
         # try to start private and public symfony
         s1 = call(["php", fname, "-q", "server:start", symfony['address']])
@@ -139,4 +152,6 @@ if symfonies:
     target.close()
 
     # launch default browser with html menu file
-    # call(['gnome-open', "file://" + htmlFilename])
+    call(['gnome-open', "file://" + htmlFilename])
+
+sys.exit(0)
