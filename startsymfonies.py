@@ -1,4 +1,4 @@
-import os, sys, socket
+import os, sys, socket, pprint
 from subprocess import call
 from time import sleep
 
@@ -47,31 +47,6 @@ for dirname, dirnames, filenames in os.walk(dir):
         # define local address
         address = localIp + str(finalLocalIp)
 
-        print dirname
-        sys.stdout.write('STOP: ')
-
-        # try to stop private and public symfony
-        s1 = call(["php", fname, "-q", "server:stop", address])
-        s2 = call(["php", fname, "-q", "server:stop", publicIp, "-p", str(publicPort)])
-
-        if s1 == 0 and s2 == 0:
-            print 'OK'
-        else:
-            print 'KO'
-
-        sys.stdout.write('START: ')
-
-        sleep(1)
-
-        # try to start private and public symfony
-        s1 = call(["php", fname, "-q", "server:start", address])
-        s2 = call(["php", fname, "-q", "server:start", publicIp, "-p", str(publicPort)])
-
-        if s1 == 0 and s2 == 0:
-            print 'OK'
-        else:
-            print 'KO'
-
         symfonies.append({
             'dirname': dirname,
             'address': address,
@@ -81,8 +56,8 @@ for dirname, dirnames, filenames in os.walk(dir):
         finalLocalIp += 1
         publicPort += 1
 
-# creation of menu html file
 if symfonies:
+    # creation of menu html file
     target = open(htmlFilename, 'w')
 
     target.writelines([
@@ -107,7 +82,39 @@ if symfonies:
         '\t\t\t</tr>\n'
     ])
 
+    # cycle over directory for find all symfonies
+    i = 1
+    count = str(len(symfonies))
     for symfony in symfonies:
+        fname = symfony['dirname'] + '/app/console'
+
+        print str(i) + '/' + count + ' ::: ' + symfony['dirname']
+        i += 1
+
+        sys.stdout.write('STOP : ')
+
+        # try to stop private and public symfony
+        s1 = call(["php", fname, "-q", "server:stop", symfony['address']])
+        s2 = call(["php", fname, "-q", "server:stop", publicIp, "-p", str(symfony['publicPort'])])
+
+        if s1 == 0 and s2 == 0:
+            print 'OK'
+        else:
+            print 'KO'
+
+        sys.stdout.write('START: ')
+
+        sleep(1)
+
+        # try to start private and public symfony
+        s1 = call(["php", fname, "-q", "server:start", symfony['address']])
+        s2 = call(["php", fname, "-q", "server:start", publicIp, "-p", str(symfony['publicPort'])])
+
+        if s1 == 0 and s2 == 0:
+            print 'OK'
+        else:
+            print 'KO'
+
         privateAddress = 'http://' + symfony['address'] + ':8000'
         publicAddress = 'http://' + publicIp + ':' + str(symfony['publicPort'])
 
@@ -116,6 +123,8 @@ if symfonies:
         target.write('\t\t\t\t<td><a href="' + privateAddress + '">' + privateAddress + '</a></td>\n')
         target.write('\t\t\t\t<td><a href="' + publicAddress + '">' + publicAddress + '</a></td>\n')
         target.write('\t\t\t</tr>\n')
+
+        print ''
 
     target.writelines([
         '\t\t</table>\n',
@@ -130,4 +139,4 @@ if symfonies:
     target.close()
 
     # launch default browser with html menu file
-    call(['gnome-open', "file://" + htmlFilename])
+    # call(['gnome-open', "file://" + htmlFilename])
