@@ -55,20 +55,12 @@ htmlTitle = Config.get('config', 'htmltitle')
 for dirname, dirnames, filenames in os.walk(dir):
     fname = dirname + '/app/console'
     if os.path.isfile(fname):
-        # define local address
-        address = localIp + str(finalLocalIp)
-
-        symfonies.append({
-            'dirname': dirname,
-            'address': address,
-            'publicPort': publicPort,
-            'favicon': dirname + '/web/favicon.ico'
-        })
-
-        finalLocalIp += 1
-        publicPort += 1
+        symfonies.append(dirname)
 
 if symfonies:
+    # order symfonies by dirname
+    symfonies = sorted(symfonies)
+
     # creation of menu html file
     target = open(htmlFilename, 'w')
 
@@ -99,17 +91,20 @@ if symfonies:
     i = 1
     count = str(len(symfonies))
     for symfony in symfonies:
-        fname = symfony['dirname'] + '/app/console'
+        # define local address
+        address = localIp + str(finalLocalIp)
 
-        print str(i) + '/' + count + ' ::: ' + symfony['dirname']
+        fname = symfony + '/app/console'
+
+        print str(i) + '/' + count + ' ::: ' + symfony
         i += 1
 
         if not startOnly:
             sys.stdout.write('STOP : ')
 
             # try to stop private and public symfony
-            s1 = call(["php", fname, "-q", "server:stop", symfony['address']])
-            s2 = call(["php", fname, "-q", "server:stop", publicIp, "-p", str(symfony['publicPort'])])
+            s1 = call(["php", fname, "-q", "server:stop", address])
+            s2 = call(["php", fname, "-q", "server:stop", publicIp, "-p", str(publicPort)])
 
             if s1 == 0 and s2 == 0:
                 print 'OK'
@@ -123,25 +118,28 @@ if symfonies:
             sys.stdout.write('START: ')
 
         # try to start private and public symfony
-        s1 = call(["php", fname, "-q", "server:start", symfony['address']])
-        s2 = call(["php", fname, "-q", "server:start", publicIp, "-p", str(symfony['publicPort'])])
+        s1 = call(["php", fname, "-q", "server:start", address])
+        s2 = call(["php", fname, "-q", "server:start", publicIp, "-p", str(publicPort)])
 
         if s1 == 0 and s2 == 0:
             print 'OK'
         else:
             print 'KO'
 
-        privateAddress = 'http://' + symfony['address'] + ':8000'
-        publicAddress = 'http://' + publicIp + ':' + str(symfony['publicPort'])
+        privateAddress = 'http://' + address + ':8000'
+        publicAddress = 'http://' + publicIp + ':' + str(publicPort)
 
         target.write('\t\t\t<tr>\n')
-        target.write('\t\t\t\t<td class="text-center"><img src="' + symfony['favicon'] + '" alt="No favicon" width="16" /></td>\n')
-        target.write('\t\t\t\t<td>' + symfony['dirname'] + '</td>\n')
+        target.write('\t\t\t\t<td class="text-center"><img src="' + symfony + '/web/favicon.ico' + '" alt="No favicon" width="16" /></td>\n')
+        target.write('\t\t\t\t<td>' + symfony + '</td>\n')
         target.write('\t\t\t\t<td><a href="' + privateAddress + '">' + privateAddress + '</a></td>\n')
         target.write('\t\t\t\t<td><a href="' + publicAddress + '">' + publicAddress + '</a></td>\n')
         target.write('\t\t\t</tr>\n')
 
         print ''
+
+        finalLocalIp += 1
+        publicPort += 1
 
     target.writelines([
         '\t\t</table>\n',
