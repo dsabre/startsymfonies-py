@@ -9,5 +9,5 @@ Can be used through the command line:
 python /your/path/startsymfonies/startsymfonies.py
 ```
 
-Support the option `--start-only` to bypass the preventive arrest of the
+You can use the option `--start-only` to bypass the preventive arrest of the
 Symfonies, useful in the case of the computer just started.
