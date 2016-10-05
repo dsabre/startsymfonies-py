@@ -1,6 +1,7 @@
-import os, sys, socket, getopt, pprint
+import os, sys, socket, getopt
 from subprocess import call
 from time import sleep
+from datetime import date
 
 try:
     from configparser import ConfigParser
@@ -60,7 +61,8 @@ for dirname, dirnames, filenames in os.walk(dir):
         symfonies.append({
             'dirname': dirname,
             'address': address,
-            'publicPort': publicPort
+            'publicPort': publicPort,
+            'favicon': dirname + '/web/favicon.ico'
         })
 
         finalLocalIp += 1
@@ -86,6 +88,7 @@ if symfonies:
         '\t<div class="table-responsive">\n',
         '\t\t<table class="table table-bordered table-hover">\n',
         '\t\t\t<tr>\n',
+        '\t\t\t\t<th>Favicon</th>\n',
         '\t\t\t\t<th>Path</th>\n',
         '\t\t\t\t<th>Private link</th>\n',
         '\t\t\t\t<th>Public link</th>\n',
@@ -132,6 +135,7 @@ if symfonies:
         publicAddress = 'http://' + publicIp + ':' + str(symfony['publicPort'])
 
         target.write('\t\t\t<tr>\n')
+        target.write('\t\t\t\t<td class="text-center"><img src="' + symfony['favicon'] + '" alt="No favicon" width="16" /></td>\n')
         target.write('\t\t\t\t<td>' + symfony['dirname'] + '</td>\n')
         target.write('\t\t\t\t<td><a href="' + privateAddress + '">' + privateAddress + '</a></td>\n')
         target.write('\t\t\t\t<td><a href="' + publicAddress + '">' + publicAddress + '</a></td>\n')
@@ -142,6 +146,7 @@ if symfonies:
     target.writelines([
         '\t\t</table>\n',
         '\t\t</div>\n',
+        '\t\t<p class="text-center text-muted"><small>Page generated automatically by StartSymfonies.<br>&copy; ' + str(date.today().year) + ' <a href="https://github.com/raniel86" target="_blank">raniel86</a></small></p>\n',
         '\t</div>\n',
         '\t<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>\n',
         '\t<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>\n',
