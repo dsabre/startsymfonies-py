@@ -21,4 +21,4 @@ go for recursive)
 - **skipdirs:** put here the directories (or a part of the names) to
 skip
 - **htmlfilename:** the path where the html generated file will be saved
- -**htmltitle:** the title of the html page (h1)
+- **htmltitle:** the title of the html page (h1)
