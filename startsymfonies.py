@@ -166,13 +166,13 @@ if symfonies:
             bgClass = 'success'
         elif stopped:
             status = 'Stopped'
-            bgClass = 'danger'
+            bgClass = 'warning'
         elif skipped:
             status = 'Skipped'
             bgClass = 'info'
         else:
-            status = '--'
-            bgClass = 'warning'
+            status = 'Error'
+            bgClass = 'danger'
 
         target.write('\t\t\t<tr>\n')
         target.write('\t\t\t\t<td class="text-center"><img src="' + symfony + '/web/favicon.ico' + '" alt="No favicon" width="16" /></td>\n')
