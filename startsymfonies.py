@@ -126,11 +126,11 @@ if symfonies:
         '\t\t\t<table class="table table-bordered table-hover table-responsive">\n',
         '\t\t\t\t<thead>\n',
         '\t\t\t\t\t<tr>\n',
-        '\t\t\t\t\t\t<th>Favicon</th>\n',
+        '\t\t\t\t\t\t<th class="text-center">Favicon</th>\n',
         '\t\t\t\t\t\t<th>Path</th>\n',
         '\t\t\t\t\t\t<th>Private link</th>\n',
         '\t\t\t\t\t\t<th>Public link</th>\n',
-        '\t\t\t\t\t\t<th>Status</th>\n',
+        '\t\t\t\t\t\t<th class="text-center">Status</th>\n',
         '\t\t\t\t\t</tr>\n'
         '\t\t\t\t</thead>\n'
         '\t\t\t\t<tbody>\n'
@@ -215,7 +215,7 @@ if symfonies:
         target.write('\t\t\t\t\t\t<td>' + symfony + '</td>\n')
         target.write('\t\t\t\t\t\t<td><a href="' + privateAddress + '">' + privateAddress + '</a></td>\n')
         target.write('\t\t\t\t\t\t<td><a href="' + publicAddress + '">' + publicAddress + '</a></td>\n')
-        target.write('\t\t\t\t\t\t<td class="bg-' + bgClass + '">' + status + '</td>\n')
+        target.write('\t\t\t\t\t\t<td class="text-center bg-' + bgClass + '">' + status + '</td>\n')
         target.write('\t\t\t\t\t</tr>\n')
 
         print ''
