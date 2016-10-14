@@ -85,19 +85,55 @@ if symfonies:
         '\t<meta name="viewport" content="width=device-width, initial-scale=1">\n',
         '\t<title>' + htmltitle + '</title>\n',
         '\t<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">\n',
+        '\t<link rel="stylesheet" href="https://bootswatch.com/superhero/bootstrap.min.css">\n',
+        '\t<style>\n',
+        '\t\ttable > thead > tr > th, .table > thead > tr > th, table > tbody > tr > th, .table > tbody > tr > th, table > tfoot > tr > th, .table > tfoot > tr > th, table > thead > tr > td, .table > thead > tr > td, table > tbody > tr > td, .table > tbody > tr > td, table > tfoot > tr > td, .table > tfoot > tr > td{\n',
+        '\t\t\tborder-color: #4e5d6c !important;\n',
+        '\t\t}\n',
+        '\t</style>\n',
         '</head>\n',
         '<body>\n',
-        '\t<div class="container-fluid">\n',
-        '\t<h1>' + htmltitle + '</h1>\n',
-        '\t<div class="table-responsive">\n',
-        '\t\t<table class="table table-bordered table-hover">\n',
-        '\t\t\t<tr>\n',
-        '\t\t\t\t<th>Favicon</th>\n',
-        '\t\t\t\t<th>Path</th>\n',
-        '\t\t\t\t<th>Status</th>\n',
-        '\t\t\t\t<th>Private link</th>\n',
-        '\t\t\t\t<th>Public link</th>\n',
-        '\t\t\t</tr>\n'
+        '\t<nav class="navbar navbar-inverse">\n',
+        '\t\t<div class="container">\n',
+        '\t\t\t<div class="navbar-header">\n',
+        '\t\t\t\t<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">\n',
+        '\t\t\t\t\t<span class="sr-only">Toggle navigation</span>\n',
+        '\t\t\t\t\t<span class="icon-bar"></span>\n',
+        '\t\t\t\t\t<span class="icon-bar"></span>\n',
+        '\t\t\t\t\t<span class="icon-bar"></span>\n',
+        '\t\t\t\t</button>\n',
+        '\t\t\t\t<a class="navbar-brand" href="#">' + htmltitle + '</a>\n',
+        '\t\t\t</div>\n',
+        '\t\t\t<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">\n',
+        '\t\t\t\t<ul class="nav navbar-nav">\n',
+        '\t\t\t\t\t<li class="dropdown">\n',
+        '\t\t\t\t\t\t<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Utilities <span class="caret"></span></a>\n',
+        '\t\t\t\t\t\t<ul class="dropdown-menu" role="menu">\n',
+        '\t\t\t\t\t\t\t<li><a href="https://symfony.com/doc/current/index.html" target="_blank">Symfony documentation</a></li>\n',
+        '\t\t\t\t\t\t</ul>\n',
+        '\t\t\t\t\t</li>\n',
+        '\t\t\t\t</ul>\n',
+        '\t\t\t\t<!--<form class="navbar-form navbar-right" role="search">\n',
+        '\t\t\t\t\t<div class="form-group">\n',
+        '\t\t\t\t\t\t<input class="form-control" placeholder="Search" type="text">\n',
+        '\t\t\t\t\t</div>\n',
+        '\t\t\t\t</form>-->\n',
+        '\t\t\t</div>\n',
+        '\t\t</div>\n',
+        '\t</nav>\n',
+        '\t<div class="container">\n',
+        '\t\t<div class="table-responsive">\n',
+        '\t\t\t<table class="table table-bordered table-hover table-responsive">\n',
+        '\t\t\t\t<thead>\n',
+        '\t\t\t\t\t<tr>\n',
+        '\t\t\t\t\t\t<th>Favicon</th>\n',
+        '\t\t\t\t\t\t<th>Path</th>\n',
+        '\t\t\t\t\t\t<th>Private link</th>\n',
+        '\t\t\t\t\t\t<th>Public link</th>\n',
+        '\t\t\t\t\t\t<th>Status</th>\n',
+        '\t\t\t\t\t</tr>\n'
+        '\t\t\t\t</thead>\n'
+        '\t\t\t\t<tbody>\n'
     ])
 
     # cycle over directory for find all symfonies
@@ -174,18 +210,19 @@ if symfonies:
             status = 'Error'
             bgClass = 'danger'
 
-        target.write('\t\t\t<tr>\n')
-        target.write('\t\t\t\t<td class="text-center"><img src="' + symfony + '/web/favicon.ico' + '" alt="No favicon" width="16" /></td>\n')
-        target.write('\t\t\t\t<td>' + symfony + '</td>\n')
-        target.write('\t\t\t\t<td class="bg-' + bgClass + '">' + status + '</td>\n')
-        target.write('\t\t\t\t<td><a href="' + privateAddress + '">' + privateAddress + '</a></td>\n')
-        target.write('\t\t\t\t<td><a href="' + publicAddress + '">' + publicAddress + '</a></td>\n')
-        target.write('\t\t\t</tr>\n')
+        target.write('\t\t\t\t\t<tr>\n')
+        target.write('\t\t\t\t\t\t<td class="text-center"><img src="' + symfony + '/web/favicon.ico' + '" alt="No favicon" width="16" /></td>\n')
+        target.write('\t\t\t\t\t\t<td>' + symfony + '</td>\n')
+        target.write('\t\t\t\t\t\t<td><a href="' + privateAddress + '">' + privateAddress + '</a></td>\n')
+        target.write('\t\t\t\t\t\t<td><a href="' + publicAddress + '">' + publicAddress + '</a></td>\n')
+        target.write('\t\t\t\t\t\t<td class="bg-' + bgClass + '">' + status + '</td>\n')
+        target.write('\t\t\t\t\t</tr>\n')
 
         print ''
 
     target.writelines([
-        '\t\t</table>\n',
+        '\t\t\t\t</tbody>\n',
+        '\t\t\t</table>\n',
         '\t\t</div>\n',
         '\t\t<p class="text-center text-muted"><small>Page generated automatically by StartSymfonies.<br>&copy; ' + str(date.today().year) + ' <a href="https://github.com/raniel86" target="_blank">raniel86</a></small></p>\n',
         '\t</div>\n',
