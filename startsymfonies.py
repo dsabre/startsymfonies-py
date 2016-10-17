@@ -35,7 +35,7 @@ if not os.path.isfile(configFile):
 
 # permit opt --start-only to perform only the start of the symfonies
 try:
-    opts, args = getopt.getopt(sys.argv[1:], '', ['start-only', 'no-public'])
+    opts, args = getopt.getopt(sys.argv[1:], '', ['start-only', 'no-public', 'no-open'])
     arrOpts = ()
 
     for opt in opts:
@@ -43,12 +43,14 @@ try:
 
     startOnly = '--start-only' in arrOpts
     noPublic = '--no-public' in arrOpts
+    noOpen = '--no-open' in arrOpts
 except getopt.GetoptError:
     print 'Invalid argument'
     sys.exit(2)
 except IndexError:
     startOnly = False
     noPublic = False
+    noOpen = False
 
 # read configuration
 Config.read(configFile)
@@ -271,6 +273,7 @@ if symfonies:
     target.close()
 
     # launch default browser with html menu file
-    # call(['gnome-open', "file://" + htmlfilename])
+    if not noOpen:
+        call(['gnome-open', "file://" + htmlfilename])
 
 sys.exit(0)
