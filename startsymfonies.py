@@ -1,4 +1,4 @@
-import os, sys, socket, getopt
+import os, sys, socket, getopt, pprint
 from subprocess import call
 from time import sleep
 from datetime import date
@@ -25,13 +25,20 @@ if not os.path.isfile(configFile):
 
 # permit opt --start-only to perform only the start of the symfonies
 try:
-    opts, args = getopt.getopt(sys.argv[1:], '', ['start-only'])
-    startOnly = '--start-only' in opts[0]
+    opts, args = getopt.getopt(sys.argv[1:], '', ['start-only', 'no-public'])
+    arrOpts = ()
+
+    for opt in opts:
+        arrOpts = arrOpts + opt
+
+    startOnly = '--start-only' in arrOpts
+    noPublic = '--no-public' in arrOpts
 except getopt.GetoptError:
     print 'Invalid argument'
     sys.exit(2)
 except IndexError:
     startOnly = False
+    noPublic = False
 
 # read configuration
 Config.read(configFile)
@@ -179,7 +186,11 @@ if symfonies:
 
             # try to start private and public symfony
             s1 = call(["php", fname, "-q", "server:start", address])
-            s2 = call(["php", fname, "-q", "server:start", publicIp, "-p", str(publicPort)])
+
+            if not noPublic:
+                s2 = call(["php", fname, "-q", "server:start", publicIp, "-p", str(publicPort)])
+            else:
+                s2 = 0
 
             # print operation status
             if s1 == 0 and s2 == 0:
@@ -214,7 +225,12 @@ if symfonies:
         target.write('\t\t\t\t\t\t<td class="text-center"><img src="' + symfony + '/web/favicon.ico' + '" alt="No favicon" width="16" /></td>\n')
         target.write('\t\t\t\t\t\t<td>' + symfony + '</td>\n')
         target.write('\t\t\t\t\t\t<td><a href="' + privateAddress + '">' + privateAddress + '</a></td>\n')
-        target.write('\t\t\t\t\t\t<td><a href="' + publicAddress + '">' + publicAddress + '</a></td>\n')
+
+        if not noPublic:
+            target.write('\t\t\t\t\t\t<td><a href="' + publicAddress + '">' + publicAddress + '</a></td>\n')
+        else:
+            target.write('\t\t\t\t\t\t<td class="text-center">--</td>\n')
+
         target.write('\t\t\t\t\t\t<td class="text-center bg-' + bgClass + '">' + status + '</td>\n')
         target.write('\t\t\t\t\t</tr>\n')
 
