@@ -9,8 +9,12 @@ Can be used through the command line:
 python /your/path/startsymfonies/startsymfonies.py
 ```
 
-You can use the option `--start-only` to bypass the preventive arrest of the
-Symfonies, useful in the case of the computer just started.
+### Options
+
+- --start-only: bypass the preventive arrest of the
+Symfonies, useful in the case of the computer just started
+- --no-public: avoid to start the public interface
+- --no-open: avoid browser auto-open
 
 ## Notes
 

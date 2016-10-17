@@ -1,4 +1,4 @@
-import os, sys, socket, getopt, pprint
+import os, sys, socket, getopt
 from subprocess import call
 from time import sleep
 from datetime import date
