@@ -1,4 +1,4 @@
-import os, sys, socket, getopt
+import os, sys, socket, getopt, pprint
 from subprocess import call
 from time import sleep
 from datetime import date
@@ -233,8 +233,15 @@ if symfonies:
             status = 'Error'
             bgClass = 'danger'
 
+        favicon = symfony + '/web/favicon.ico'
+
         target.write('\t\t\t\t\t<tr>\n')
-        target.write('\t\t\t\t\t\t<td class="text-center"><img src="' + symfony + '/web/favicon.ico' + '" alt="No favicon" width="16" /></td>\n')
+
+        if os.path.isfile(favicon):
+            target.write('\t\t\t\t\t\t<td class="text-center"><img src="' + favicon + '" alt="No favicon" width="16" /></td>\n')
+        else:
+            target.write('\t\t\t\t\t\t<td class="text-center">--</td>\n')
+
         target.write('\t\t\t\t\t\t<td>' + symfony + '</td>\n')
         target.write('\t\t\t\t\t\t<td><a href="' + privateAddress + '">' + privateAddress + '</a></td>\n')
 
