@@ -8,6 +8,16 @@ try:
 except ImportError:
     from ConfigParser import ConfigParser  # ver. < 3.0
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 # check if config.ini exists
 configFile = os.path.dirname(os.path.abspath(__file__)) + '/config.ini'
 Config = ConfigParser()
@@ -155,7 +165,7 @@ if symfonies:
         privateAddress = ''
         publicAddress = ''
 
-        print str(i) + '/' + count + ' ::: ' + symfony
+        print bcolors.HEADER + str(i) + '/' + count + bcolors.ENDC + ' ::: ' + symfony
         i += 1
 
         if not skipped:
@@ -173,10 +183,10 @@ if symfonies:
 
                 # print operation status
                 if s1 == 0 and s2 == 0:
-                    print 'OK'
+                    print bcolors.OKGREEN + 'OK' + bcolors.ENDC
                     stopped = True
                 else:
-                    print 'KO'
+                    print bcolors.FAIL + 'KO' + bcolors.ENDC
 
                 sys.stdout.write('START: ')
 
@@ -194,10 +204,10 @@ if symfonies:
 
             # print operation status
             if s1 == 0 and s2 == 0:
-                print 'OK'
+                print bcolors.OKGREEN + 'OK' + bcolors.ENDC
                 started = True
             else:
-                print 'KO'
+                print bcolors.FAIL + 'KO' + bcolors.ENDC
 
             privateAddress = 'http://' + address + ':8000'
             publicAddress = 'http://' + publicIp + ':' + str(publicPort)
@@ -261,6 +271,6 @@ if symfonies:
     target.close()
 
     # launch default browser with html menu file
-    call(['gnome-open', "file://" + htmlfilename])
+    # call(['gnome-open', "file://" + htmlfilename])
 
 sys.exit(0)
