@@ -15,6 +15,7 @@ python /your/path/startsymfonies/startsymfonies.py
 Symfonies, useful in the case of the computer just started
 - --no-public: avoid to start the public interface
 - --no-open: avoid browser auto-open
+- --no-theme: put this to not use bootstrap theme and navbar controls, useful in case of a pc without (or very slow) internet connection
 
 ## Notes
 
