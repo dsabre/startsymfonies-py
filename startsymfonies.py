@@ -136,6 +136,11 @@ if symfonies:
         '\t\t\t\t\t<div class="form-group">\n',
         '\t\t\t\t\t\t<input class="form-control" placeholder="Search" type="text" id="search">\n',
         '\t\t\t\t\t</div>\n',
+        '\t\t\t\t\t<div class="checkbox">\n',
+        '\t\t\t\t\t\t<label>\n',
+        '\t\t\t\t\t\t\t<input id="flgHideSkipped" type="checkbox" checked> Hide skipped\n',
+        '\t\t\t\t\t\t</label>\n',
+        '\t\t\t\t\t</div>\n',
         '\t\t\t\t</form>\n',
         '\t\t\t</div>\n',
         '\t\t</div>\n',
@@ -250,7 +255,7 @@ if symfonies:
         else:
             target.write('\t\t\t\t\t\t<td class="text-center">--</td>\n')
 
-        target.write('\t\t\t\t\t\t<td class="text-center bg-' + bgClass + '">' + status + '</td>\n')
+        target.write('\t\t\t\t\t\t<td class="col-status text-center bg-' + bgClass + '">' + status + '</td>\n')
         target.write('\t\t\t\t\t</tr>\n')
 
         print ''
@@ -264,13 +269,26 @@ if symfonies:
         '\t<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>\n',
         '\t<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>\n',
         '\t<script type="text/javascript">\n',
-        '\t\tvar $rows = $("table tbody tr");\n',
-        '\t\t$("#search").keyup(function() {\n',
-        '\t\t\tvar val = $.trim($(this).val()).replace(/ +/g, " ").toLowerCase();\n',
-        '\t\t\t$rows.show().filter(function() {\n',
-        '\t\t\t\tvar text = $(this).text().replace(/\s+/g, " ").toLowerCase();\n',
-        '\t\t\t\treturn !~text.indexOf(val);\n',
-        '\t\t\t}).hide();\n',
+        '\t\t$(function() {\n',
+        '\t\t\tvar $rows = $("table tbody tr");\n',
+        '\t\t\tmanageRows();\n',
+        '\t\t\t$("#search").keyup(function() {\n',
+        '\t\t\t\tmanageRows();\n',
+        '\t\t\t});\n',
+        '\t\t\t$("#flgHideSkipped").click(function() {\n',
+        '\t\t\t\tmanageRows();\n',
+        '\t\t\t});\n',
+        '\t\t\tfunction manageRows(){\n',
+        '\t\t\t\tvar string = $.trim($("#search").val()).replace(/ +/g, " ").toLowerCase();\n',
+        '\t\t\t\tvar hideSkipped = $("#flgHideSkipped").is(":checked");\n',
+        '\t\t\t\t$rows.show().filter(function() {\n',
+        '\t\t\t\t\tvar text = $(this).text().replace(/\s+/g, " ").toLowerCase();\n',
+        '\t\t\t\t\tvar status = $(this).children("td.col-status").text().replace(/\s+/g, " ").toLowerCase();\n',
+        '\t\t\t\t\tvar checkString = string !== "" ? !~text.indexOf(string) : false;\n',
+        '\t\t\t\t\tvar checkSkipped = hideSkipped ? ~status.indexOf("skipped") : false;\n',
+        '\t\t\t\t\treturn checkString || checkSkipped;\n',
+        '\t\t\t\t}).hide();\n',
+        '\t\t\t}\n',
         '\t\t});\n',
         '\t</script>\n',
         '</body>\n',
