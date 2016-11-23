@@ -26,6 +26,7 @@ if not os.path.isfile(configFile):
     Config.add_section('config')
     Config.set('config', 'dir', 'INSER_HERE_YOUR_PATH')
     Config.set('config', 'skipdirs', '')
+    Config.set('config', 'starred', '')
     Config.set('config', 'htmlfilename', '/tmp/symfonies.html')
     Config.set('config', 'htmltitle', 'Active Symfonies')
     Config.write(config)
@@ -77,22 +78,33 @@ htmltitle = Config.get('config', 'htmltitle')
 skipdirs = Config.get('config', 'skipdirs')
 skipdirs = skipdirs.split(',') if skipdirs else None
 
+# get starred projects
+starred = Config.get('config', 'starred')
+starred = starred.split(',') if starred else None
+
 # cycle over directory for find all symfonies
 for dirname, dirnames, filenames in os.walk(dir):
     fname = dirname + '/app/console'
     if os.path.isfile(fname):
         skip = False
+        star = False
 
         if skipdirs:
             for i in skipdirs:
                 if dirname.find(i) > -1:
                     skip = True
 
-        symfonies.append({'dirname': dirname, 'skip': skip})
+        if starred:
+            for i in starred:
+                if dirname.find(i) > -1:
+                    star = True
+
+        symfonies.append({'dirname': dirname, 'skip': skip, 'starred': star})
 
 if symfonies:
     # order symfonies by dirname
     symfonies = sorted(symfonies, key=lambda symfony: symfony['dirname'])
+    symfonies = sorted(symfonies, key=lambda symfony: symfony['starred'], reverse=True)
 
     # creation of menu html file
     target = open(htmlfilename, 'w')
@@ -187,6 +199,7 @@ if symfonies:
         '\t\t\t<table class="table table-bordered table-hover table-responsive">\n',
         '\t\t\t\t<thead>\n',
         '\t\t\t\t\t<tr>\n',
+        '\t\t\t\t\t\t<th class="text-center">Starred</th>\n',
         '\t\t\t\t\t\t<th class="text-center">Favicon</th>\n',
         '\t\t\t\t\t\t<th>Path</th>\n',
         '\t\t\t\t\t\t<th>Private link</th>\n',
@@ -278,6 +291,12 @@ if symfonies:
         favicon = symfony + '/web/favicon.ico'
 
         target.write('\t\t\t\t\t<tr>\n')
+
+        star = '<span class="glyphicon glyphicon-star-empty text-muted" aria-hidden="true"></span>'
+        if infoSymfony['starred']:
+            star = '<span class="glyphicon glyphicon-star text-warning" aria-hidden="true"></span>'
+
+        target.write('\t\t\t\t\t\t<td class="text-center">' + star + '</td>\n')
 
         if os.path.isfile(favicon):
             target.write('\t\t\t\t\t\t<td class="text-center"><img src="' + favicon + '" alt="No favicon" width="16" /></td>\n')
