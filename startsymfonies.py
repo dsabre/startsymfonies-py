@@ -58,14 +58,6 @@ except IndexError:
 # read configuration
 Config.read(configFile)
 
-# get directory to scan
-dir = Config.get('config', 'dir')
-
-# check for valid directory
-if not os.path.isdir(dir):
-    print 'Invalid directory ' + dir
-    sys.exit(3)
-
 publicIp = socket.gethostbyname(socket.gethostname())
 localIp = "127.0.0."
 finalLocalIp = 1
@@ -82,24 +74,34 @@ skipdirs = skipdirs.split(',') if skipdirs else None
 starred = Config.get('config', 'starred')
 starred = starred.split(',') if starred else None
 
-# cycle over directory for find all symfonies
-for dirname, dirnames, filenames in os.walk(dir):
-    fname = dirname + '/app/console'
-    if os.path.isfile(fname):
-        skip = False
-        star = False
+# get directories to scan
+dir = Config.get('config', 'dir')
+dir = dir.split(',') if dir else None
 
-        if skipdirs:
-            for i in skipdirs:
-                if dirname.find(i) > -1:
-                    skip = True
+for d in dir:
+    # check for valid directory
+    if not os.path.isdir(d):
+        print 'Invalid directory ' + d
+        sys.exit(3)
 
-        if starred:
-            for i in starred:
-                if dirname.find(i) > -1:
-                    star = True
+    # cycle over directory for find all symfonies
+    for dirname, dirnames, filenames in os.walk(d):
+        fname = dirname + '/app/console'
+        if os.path.isfile(fname):
+            skip = False
+            star = False
 
-        symfonies.append({'dirname': dirname, 'skip': skip, 'starred': star})
+            if skipdirs:
+                for i in skipdirs:
+                    if dirname.find(i) > -1:
+                        skip = True
+
+            if starred:
+                for i in starred:
+                    if dirname.find(i) > -1:
+                        star = True
+
+            symfonies.append({'dirname': dirname, 'skip': skip, 'starred': star})
 
 if symfonies:
     # order symfonies by dirname
