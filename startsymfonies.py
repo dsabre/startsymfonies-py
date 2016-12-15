@@ -2,6 +2,19 @@ import os, sys, socket, getopt, pprint
 from subprocess import call
 from time import sleep
 from datetime import date
+import platform
+
+def isMac():
+    return platform.system() == 'Darwin'
+
+
+def isWindows():
+    return platform.system() == 'Windows'
+
+
+if isWindows():
+    print "Please choose a serious operating system :)"
+    sys.exit()
 
 try:
     from configparser import ConfigParser
@@ -58,7 +71,11 @@ except IndexError:
 # read configuration
 Config.read(configFile)
 
-publicIp = socket.gethostbyname(socket.gethostname())
+try:
+    publicIp = socket.gethostbyname(socket.gethostname())
+except:
+    noPublic = True
+
 localIp = "127.0.0."
 finalLocalIp = 1
 publicPort = 8000
@@ -227,18 +244,27 @@ if symfonies:
         print bcolors.HEADER + str(i) + '/' + count + bcolors.ENDC + ' ::: ' + symfony
         i += 1
 
+        privatePort = 8000
         if not skipped:
-            # define local address
-            address = localIp + str(finalLocalIp)
+            if isMac():
+                privatePort = publicPort
+                address = '127.0.0.1'
+            else:
+                # define local address
+                address = localIp + str(finalLocalIp)
 
+            print address + " " + str(privatePort)
             fname = symfony + '/app/console'
 
             if not startOnly:
                 sys.stdout.write('STOP : ')
 
                 # try to stop private and public symfony
-                s1 = call(["php", fname, "-q", "server:stop", address])
-                s2 = call(["php", fname, "-q", "server:stop", publicIp, "-p", str(publicPort)])
+                s1 = call(["php", fname, "-q", "server:stop", address, "-p", str(privatePort)])
+                if not noPublic:
+                    s2 = call(["php", fname, "-q", "server:stop", publicIp, "-p", str(publicPort)])
+                else:
+                    s2 = 0
 
                 # print operation status
                 if s1 == 0 and s2 == 0:
@@ -254,7 +280,7 @@ if symfonies:
                 sys.stdout.write('START: ')
 
             # try to start private and public symfony
-            s1 = call(["php", fname, "-q", "server:start", address])
+            s1 = call(["php", fname, "-q", "server:start", address, "-p", str(privatePort)])
 
             if not noPublic:
                 s2 = call(["php", fname, "-q", "server:start", publicIp, "-p", str(publicPort)])
@@ -267,9 +293,13 @@ if symfonies:
                 started = True
             else:
                 print bcolors.FAIL + 'KO' + bcolors.ENDC
+            
+            privateAddress = 'http://' + address + ':' + str(privatePort)
 
-            privateAddress = 'http://' + address + ':8000'
-            publicAddress = 'http://' + publicIp + ':' + str(publicPort)
+            if not noPublic:
+                publicAddress = 'http://' + publicIp + ':' + str(publicPort)
+            else:
+                publicAddress = '--'
 
             finalLocalIp += 1
             publicPort += 1
@@ -371,6 +401,9 @@ if symfonies:
 
     # launch default browser with html menu file
     if not noOpen:
-        call(['gnome-open', "file://" + htmlfilename])
+        if isMac():
+            call(['open', "file://" + htmlfilename])
+        else:
+            call(['gnome-open', "file://" + htmlfilename])
 
 sys.exit(0)
