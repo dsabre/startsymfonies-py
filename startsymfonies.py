@@ -1,5 +1,4 @@
-import os, sys, socket, getopt, pprint
-from subprocess import call
+import os, sys, socket, getopt, subprocess, pprint
 from time import sleep
 from datetime import date
 import platform
@@ -103,8 +102,12 @@ for d in dir:
 
     # cycle over directory for find all symfonies
     for dirname, dirnames, filenames in os.walk(d):
-        fname = dirname + '/app/console'
-        if os.path.isfile(fname):
+        fnameSymfony2 = dirname + '/app/console'
+        fnameSymfony3 = dirname + '/bin/console'
+        isSymfony2 = os.path.isfile(fnameSymfony2)
+        isSymfony3 = os.path.isfile(fnameSymfony3)
+
+        if isSymfony2 or isSymfony3:
             skip = False
             star = False
 
@@ -118,7 +121,11 @@ for d in dir:
                     if dirname.find(i) > -1:
                         star = True
 
-            symfonies.append({'dirname': dirname, 'skip': skip, 'starred': star})
+            symfonyVer = 2
+            if isSymfony3:
+                symfonyVer = 3
+
+            symfonies.append({'dirname': dirname, 'skip': skip, 'starred': star, 'symfonyVer': symfonyVer})
 
 if symfonies:
     # order symfonies by dirname
@@ -221,6 +228,7 @@ if symfonies:
         '\t\t\t\t\t\t<th class="text-center">Starred</th>\n',
         '\t\t\t\t\t\t<th class="text-center">Favicon</th>\n',
         '\t\t\t\t\t\t<th>Path</th>\n',
+        '\t\t\t\t\t\t<th>Version</th>\n',
         '\t\t\t\t\t\t<th>Private link</th>\n',
         '\t\t\t\t\t\t<th>Public link</th>\n',
         '\t\t\t\t\t\t<th class="text-center">Status</th>\n',
@@ -234,6 +242,7 @@ if symfonies:
     count = str(len(symfonies))
     for infoSymfony in symfonies:
         symfony = infoSymfony['dirname']
+        symfonyVer = str(infoSymfony['symfonyVer'])
 
         stopped = False
         started = False
@@ -254,15 +263,18 @@ if symfonies:
                 address = localIp + str(finalLocalIp)
 
             print address + " " + str(privatePort)
-            fname = symfony + '/app/console'
+            if symfonyVer == '2':
+                fname = symfony + '/app/console'
+            else:
+                fname = symfony + '/bin/console'
 
             if not startOnly:
                 sys.stdout.write('STOP : ')
 
                 # try to stop private and public symfony
-                s1 = call(["php", fname, "-q", "server:stop", address, "-p", str(privatePort)])
+                s1 = subprocess.call(["php", fname, "-q", "server:stop", address, "-p", str(privatePort)])
                 if not noPublic:
-                    s2 = call(["php", fname, "-q", "server:stop", publicIp, "-p", str(publicPort)])
+                    s2 = subprocess.call(["php", fname, "-q", "server:stop", publicIp, "-p", str(publicPort)])
                 else:
                     s2 = 0
 
@@ -280,10 +292,10 @@ if symfonies:
                 sys.stdout.write('START: ')
 
             # try to start private and public symfony
-            s1 = call(["php", fname, "-q", "server:start", address, "-p", str(privatePort)])
+            s1 = subprocess.call(["php", fname, "-q", "server:start", address, "-p", str(privatePort)])
 
             if not noPublic:
-                s2 = call(["php", fname, "-q", "server:start", publicIp, "-p", str(publicPort)])
+                s2 = subprocess.call(["php", fname, "-q", "server:start", publicIp, "-p", str(publicPort)])
             else:
                 s2 = 0
 
@@ -322,6 +334,8 @@ if symfonies:
 
         favicon = symfony + '/web/favicon.ico'
 
+        symfonyVerDetailed = subprocess.Popen(["php", fname], stdout=subprocess.PIPE).communicate()[0].split('\n')[0]
+
         target.write('\t\t\t\t\t<tr>\n')
 
         star = '<span class="glyphicon glyphicon-star-empty text-muted" aria-hidden="true"></span>'
@@ -336,6 +350,7 @@ if symfonies:
             target.write('\t\t\t\t\t\t<td class="text-center">--</td>\n')
 
         target.write('\t\t\t\t\t\t<td>' + symfony + '</td>\n')
+        target.write('\t\t\t\t\t\t<td>' + symfonyVerDetailed + '</td>\n')
         target.write('\t\t\t\t\t\t<td><a href="' + privateAddress + '">' + privateAddress + '</a></td>\n')
 
         if not noPublic:
@@ -402,8 +417,8 @@ if symfonies:
     # launch default browser with html menu file
     if not noOpen:
         if isMac():
-            call(['open', "file://" + htmlfilename])
+            subprocess.call(['open', "file://" + htmlfilename])
         else:
-            call(['gnome-open', "file://" + htmlfilename])
+            subprocess.call(['gnome-open', "file://" + htmlfilename])
 
 sys.exit(0)
