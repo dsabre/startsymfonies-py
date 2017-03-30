@@ -142,6 +142,7 @@ if symfonies:
         '\t<meta charset="utf-8">\n',
         '\t<meta http-equiv="X-UA-Compatible" content="IE=edge">\n',
         '\t<meta name="viewport" content="width=device-width, initial-scale=1">\n',
+        '\t<link rel = "shortcut icon" href = "https://symfony.com/favicon.ico" type = "image/x-icon">\n',
         '\t<title>' + htmltitle + '</title>\n',
     ])
 
