@@ -247,9 +247,12 @@ if symfonies:
 
         stopped = False
         started = False
+        startedPublic = False
+        startedPrivate = False
         skipped = infoSymfony['skip']
         privateAddress = ''
         publicAddress = ''
+        symfonyVerDetailed = ''
 
         print bcolors.HEADER + str(i) + '/' + count + bcolors.ENDC + ' ::: ' + symfony
         i += 1
@@ -269,18 +272,29 @@ if symfonies:
             else:
                 fname = symfony + '/bin/console'
 
+            symfonyVerDetailed = subprocess.Popen(["php", fname], stdout=subprocess.PIPE).communicate()[0].split('\n')[0]
+
             if not startOnly:
                 sys.stdout.write('STOP : ')
 
                 # try to stop private and public symfony
-                s1 = subprocess.call(["php", fname, "-q", "server:stop", address, "-p", str(privatePort)])
+                # s1 = subprocess.call(["php", fname, "-q", "server:stop", address, "-p", str(privatePort)])
+                if symfonyVerDetailed.find(" 3.3") > -1:
+                    s1 = subprocess.call(["php", fname, "-q", "server:stop"])
+                else:
+                    s1 = subprocess.call(["php", fname, "-q", "server:stop", address + ":" + str(privatePort)])
+
                 if not noPublic:
-                    s2 = subprocess.call(["php", fname, "-q", "server:stop", publicIp, "-p", str(publicPort)])
+                    # s2 = subprocess.call(["php", fname, "-q", "server:stop", publicIp, "-p", str(publicPort)])
+                    if symfonyVerDetailed.find(" 3.3") > -1:
+                        s2 = subprocess.call(["php", fname, "-q", "server:stop"])
+                    else:
+                        s2 = subprocess.call(["php", fname, "-q", "server:stop", publicIp + ":" + str(publicPort)])
                 else:
                     s2 = 0
 
                 # print operation status
-                if s1 == 0 and s2 == 0:
+                if s1 == 0 or s2 == 0:
                     print bcolors.OKGREEN + 'OK' + bcolors.ENDC
                     stopped = True
                 else:
@@ -293,10 +307,12 @@ if symfonies:
                 sys.stdout.write('START: ')
 
             # try to start private and public symfony
-            s1 = subprocess.call(["php", fname, "-q", "server:start", address, "-p", str(privatePort)])
+            # s1 = subprocess.call(["php", fname, "-q", "server:start", address, "-p", str(privatePort)])
+            s1 = subprocess.call(["php", fname, "-q", "server:start", address + ":" + str(privatePort)])
 
             if not noPublic:
-                s2 = subprocess.call(["php", fname, "-q", "server:start", publicIp, "-p", str(publicPort)])
+                # s2 = subprocess.call(["php", fname, "-q", "server:start", publicIp, "-p", str(publicPort)])
+                s2 = subprocess.call(["php", fname, "-q", "server:start", publicIp + ":" + str(publicPort)])
             else:
                 s2 = 0
 
@@ -304,6 +320,12 @@ if symfonies:
             if s1 == 0 and s2 == 0:
                 print bcolors.OKGREEN + 'OK' + bcolors.ENDC
                 started = True
+            elif s1 != 0 and s2 == 0:
+                print bcolors.WARNING + 'WARNING: started only in public mode' + bcolors.ENDC
+                startedPublic = True
+            elif s1 == 0 and s2 != 0:
+                print bcolors.WARNING + 'WARNING: started only in private mode' + bcolors.ENDC
+                startedPrivate = True
             else:
                 print bcolors.FAIL + 'KO' + bcolors.ENDC
             
@@ -329,13 +351,17 @@ if symfonies:
         elif skipped:
             status = 'Skipped'
             bgClass = 'info'
+        elif startedPrivate:
+            status = 'Private only'
+            bgClass = 'warning'
+        elif startedPublic:
+            status = 'Public only'
+            bgClass = 'warning'
         else:
             status = 'Error'
             bgClass = 'danger'
 
         favicon = symfony + '/web/favicon.ico'
-
-        symfonyVerDetailed = subprocess.Popen(["php", fname], stdout=subprocess.PIPE).communicate()[0].split('\n')[0]
 
         target.write('\t\t\t\t\t<tr>\n')
 
@@ -352,9 +378,13 @@ if symfonies:
 
         target.write('\t\t\t\t\t\t<td>' + symfony + '</td>\n')
         target.write('\t\t\t\t\t\t<td>' + symfonyVerDetailed + '</td>\n')
-        target.write('\t\t\t\t\t\t<td><a href="' + privateAddress + '">' + privateAddress + '</a></td>\n')
 
-        if not noPublic:
+        if started or startedPrivate:
+            target.write('\t\t\t\t\t\t<td><a href="' + privateAddress + '">' + privateAddress + '</a></td>\n')
+        else:
+            target.write('\t\t\t\t\t\t<td><a href="' + privateAddress + '">--</a></td>\n')
+
+        if not noPublic and (started or startedPublic):
             target.write('\t\t\t\t\t\t<td><a href="' + publicAddress + '">' + publicAddress + '</a></td>\n')
         else:
             target.write('\t\t\t\t\t\t<td class="text-center">--</td>\n')
